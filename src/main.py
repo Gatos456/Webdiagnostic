@@ -8,11 +8,9 @@ from diagnostics.smart_reader import leer_smart
 from diagnostics.parser import parsear_smart
 
 
-def main():
+def actualizar_analisis(window):
 
-    app = QApplication(sys.argv)
-
-    window = MainWindow()
+    window.analisis_iniciado()
 
     discos = detectar_discos()
 
@@ -29,6 +27,23 @@ def main():
         disco["vida"] = datos["vida"]
 
     window.mostrar_discos(discos)
+
+    window.analisis_finalizado()
+
+
+def main():
+
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+
+    # Primer análisis al abrir la aplicación
+    actualizar_analisis(window)
+
+    # Botón actualizar análisis
+    window.btn_actualizar.clicked.connect(
+        lambda: actualizar_analisis(window)
+    )
 
     window.show()
 

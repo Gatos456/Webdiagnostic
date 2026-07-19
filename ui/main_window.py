@@ -12,6 +12,8 @@ from PySide6.QtWidgets import (
     QAbstractItemView
 )
 
+from PySide6.QtCore import QTimer
+
 
 class MainWindow(QMainWindow):
 
@@ -27,7 +29,6 @@ class MainWindow(QMainWindow):
 
         main_layout = QHBoxLayout()
         central.setLayout(main_layout)
-
 
         # ==========================
         # Barra lateral
@@ -56,6 +57,19 @@ class MainWindow(QMainWindow):
 
         sidebar_layout.addStretch()
 
+        self.btn_actualizar = QPushButton("🔄 Actualizar análisis")
+        self.btn_actualizar.setFixedHeight(45)
+
+        sidebar_layout.addWidget(self.btn_actualizar)
+
+        # Estado del análisis
+        self.estado = QLabel("Listo")
+        self.estado.setStyleSheet("""
+            font-size:12px;
+            color:gray;
+        """)
+
+        sidebar_layout.addWidget(self.estado)
 
         # ==========================
         # Panel principal
@@ -66,7 +80,6 @@ class MainWindow(QMainWindow):
         panel_layout = QVBoxLayout()
         panel.setLayout(panel_layout)
 
-
         titulo_panel = QLabel("Panel de diagnóstico")
 
         titulo_panel.setStyleSheet("""
@@ -74,16 +87,10 @@ class MainWindow(QMainWindow):
             font-weight:bold;
         """)
 
-
         descripcion = QLabel(
             "Bienvenido a Web Diagnostic.\n\n"
             "Información SMART de discos HDD y SSD."
         )
-
-
-        # ==========================
-        # Tabla discos
-        # ==========================
 
         self.tabla = QTableWidget()
 
@@ -116,7 +123,6 @@ class MainWindow(QMainWindow):
             QAbstractItemView.NoEditTriggers
         )
 
-
         panel_layout.addWidget(titulo_panel)
         panel_layout.addWidget(descripcion)
         panel_layout.addWidget(self.tabla)
@@ -124,15 +130,9 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(sidebar)
         main_layout.addWidget(panel)
 
-
-    # ==========================
-    # Mostrar discos
-    # ==========================
-
     def mostrar_discos(self, discos):
 
         self.tabla.setRowCount(len(discos))
-
 
         for fila, disco in enumerate(discos):
 
@@ -147,7 +147,6 @@ class MainWindow(QMainWindow):
                 f'{disco.get("vida", "-")} %'
             ]
 
-
             for columna, valor in enumerate(datos):
 
                 self.tabla.setItem(
@@ -155,3 +154,16 @@ class MainWindow(QMainWindow):
                     columna,
                     QTableWidgetItem(valor)
                 )
+
+    def analisis_iniciado(self):
+        self.estado.setText("🔄 Actualizando análisis...")
+        self.btn_actualizar.setEnabled(False)
+
+    def analisis_finalizado(self):
+        self.estado.setText("✅ Análisis completado")
+        self.btn_actualizar.setEnabled(True)
+
+        QTimer.singleShot(
+            3000,
+            lambda: self.estado.setText("Listo")
+        )
