@@ -156,11 +156,11 @@ class MainWindow(QMainWindow):
                 )
 
     def analisis_iniciado(self):
-        self.estado.setText("🔄 Actualizando análisis...")
+        self.estado.setText(" Actualizando análisis...")
         self.btn_actualizar.setEnabled(False)
 
     def analisis_finalizado(self):
-        self.estado.setText("✅ Análisis completado")
+        self.estado.setText(" Análisis completado")
         self.btn_actualizar.setEnabled(True)
 
         QTimer.singleShot(
