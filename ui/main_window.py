@@ -14,21 +14,20 @@ from PySide6.QtWidgets import (
 
 
 class MainWindow(QMainWindow):
+
     def __init__(self):
+
         super().__init__()
 
         self.setWindowTitle("Web Diagnostic")
-        self.resize(1200, 700)
-
-        # ==========================
-        # Widget principal
-        # ==========================
+        self.resize(1400, 700)
 
         central = QWidget()
         self.setCentralWidget(central)
 
         main_layout = QHBoxLayout()
         central.setLayout(main_layout)
+
 
         # ==========================
         # Barra lateral
@@ -41,6 +40,7 @@ class MainWindow(QMainWindow):
         sidebar.setLayout(sidebar_layout)
 
         titulo = QLabel("WEB\nDIAGNOSTIC")
+
         titulo.setStyleSheet("""
             font-size:22px;
             font-weight:bold;
@@ -56,6 +56,7 @@ class MainWindow(QMainWindow):
 
         sidebar_layout.addStretch()
 
+
         # ==========================
         # Panel principal
         # ==========================
@@ -65,66 +66,64 @@ class MainWindow(QMainWindow):
         panel_layout = QVBoxLayout()
         panel.setLayout(panel_layout)
 
+
         titulo_panel = QLabel("Panel de diagnóstico")
+
         titulo_panel.setStyleSheet("""
             font-size:24px;
             font-weight:bold;
         """)
 
+
         descripcion = QLabel(
             "Bienvenido a Web Diagnostic.\n\n"
-            "Desde aquí podrás analizar discos duros y SSD,\n"
-            "consultar su estado SMART y generar informes."
+            "Información SMART de discos HDD y SSD."
         )
 
+
         # ==========================
-        # Tabla
+        # Tabla discos
         # ==========================
 
         self.tabla = QTableWidget()
 
-        self.tabla.setColumnCount(5)
+        self.tabla.setColumnCount(8)
 
         self.tabla.setHorizontalHeaderLabels([
             "Disco",
             "Modelo",
             "Capacidad",
             "Estado",
-            "Temperatura"
+            "Temperatura",
+            "Horas",
+            "Encendidos",
+            "Vida SSD"
         ])
 
-        self.tabla.setRowCount(0)
+        self.tabla.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch
+        )
 
-        # Ajustar columnas automáticamente
-        self.tabla.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        # Ocultar números de fila
         self.tabla.verticalHeader().setVisible(False)
 
-        # Colores alternos
         self.tabla.setAlternatingRowColors(True)
 
-        # Seleccionar fila completa
         self.tabla.setSelectionBehavior(
             QAbstractItemView.SelectRows
         )
 
-        # No permitir editar
         self.tabla.setEditTriggers(
             QAbstractItemView.NoEditTriggers
         )
 
-        # ==========================
-        # Añadir widgets
-        # ==========================
 
         panel_layout.addWidget(titulo_panel)
         panel_layout.addWidget(descripcion)
         panel_layout.addWidget(self.tabla)
-        panel_layout.addStretch()
 
         main_layout.addWidget(sidebar)
         main_layout.addWidget(panel)
+
 
     # ==========================
     # Mostrar discos
@@ -134,34 +133,25 @@ class MainWindow(QMainWindow):
 
         self.tabla.setRowCount(len(discos))
 
+
         for fila, disco in enumerate(discos):
 
-            self.tabla.setItem(
-                fila,
-                0,
-                QTableWidgetItem(f"Disco {fila}")
-            )
+            datos = [
+                f"Disco {fila + 1}",
+                disco.get("modelo", "-"),
+                disco.get("capacidad", "-"),
+                disco.get("estado", "-"),
+                f'{disco.get("temperatura", "-")} °C',
+                str(disco.get("horas", "-")),
+                str(disco.get("encendidos", "-")),
+                f'{disco.get("vida", "-")} %'
+            ]
 
-            self.tabla.setItem(
-                fila,
-                1,
-                QTableWidgetItem(disco["modelo"])
-            )
 
-            self.tabla.setItem(
-                fila,
-                2,
-                QTableWidgetItem(disco["capacidad"])
-            )
+            for columna, valor in enumerate(datos):
 
-            self.tabla.setItem(
-                fila,
-                3,
-                QTableWidgetItem("🟢 Detectado")
-            )
-
-            self.tabla.setItem(
-                fila,
-                4,
-                QTableWidgetItem("-")
-            )
+                self.tabla.setItem(
+                    fila,
+                    columna,
+                    QTableWidgetItem(valor)
+                )

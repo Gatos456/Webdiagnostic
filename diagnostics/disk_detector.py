@@ -14,6 +14,7 @@ def detectar_discos():
         lineas = resultado.stdout.splitlines()
 
         for linea in lineas[1:]:
+
             linea = linea.strip()
 
             if not linea:
@@ -28,15 +29,21 @@ def detectar_discos():
             size = partes[1]
 
             try:
-                gb = round(int(size) / (1024**3))
+                gb = round(int(size) / (1024 ** 3))
                 capacidad = f"{gb} GB"
             except:
                 capacidad = "-"
 
-            discos.append({
-                "modelo": modelo,
-                "capacidad": capacidad
-            })
+            discos.append(
+                {
+                    "modelo": modelo,
+                    "capacidad": capacidad,
+
+                    # De momento fijo.
+                    # En la v0.3 se obtendrá automáticamente.
+                    "dispositivo": "/dev/sda"
+                }
+            )
 
     except Exception as e:
         print(e)
